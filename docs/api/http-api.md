@@ -593,7 +593,8 @@ Create a new project (stored in SQLite).
 ```
 
 `budget_action` must be `warn`, `throttle`, or `block`. Both create and update requests
-return `400 Bad Request` for any other value.
+return `400 Bad Request` for any other value. When omitted from a create request it defaults
+to `warn`; when omitted from an update request, the stored value is retained.
 
 **Response:**
 

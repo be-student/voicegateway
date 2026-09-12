@@ -642,32 +642,34 @@ async def test_delete_model_confirm(client):
 # --------------------------------------------------------------------
 
 
-async def test_create_project(client):
+@pytest.mark.parametrize("budget_action", ["warn", "block", "throttle"])
+async def test_create_project(client, budget_action):
     resp = await client.post(
         "/v1/projects",
         json={
             "project_id": "http-proj",
             "name": "HTTP Project",
-            "budget_action": "block",
+            "budget_action": budget_action,
         },
     )
     assert resp.status_code == 200
     assert resp.json()["source"] == "db"
     detail = await client.get("/v1/projects/http-proj")
-    assert detail.json()["budget_action"] == "block"
+    assert detail.json()["budget_action"] == budget_action
 
 
-async def test_create_project_rejects_bad_budget_action(client):
+@pytest.mark.parametrize("budget_action", ["explode", 123])
+async def test_create_project_rejects_bad_budget_action(client, budget_action):
     resp = await client.post(
         "/v1/projects",
         json={
             "project_id": "bad-action",
             "name": "Invalid",
-            "budget_action": "explode",
+            "budget_action": budget_action,
         },
     )
     assert resp.status_code == 400
-    assert resp.json()["detail"] == "Invalid budget_action 'explode'"
+    assert resp.json()["detail"] == f"Invalid budget_action '{budget_action}'"
 
 
 async def test_create_project_conflict(client):
@@ -694,7 +696,8 @@ async def test_patch_project(client):
     assert resp.json()["updated"] is True
 
 
-async def test_patch_project_rejects_bad_budget_action(client):
+@pytest.mark.parametrize("budget_action", ["explode", 123])
+async def test_patch_project_rejects_bad_budget_action(client, budget_action):
     await client.post(
         "/v1/projects",
         json={
@@ -703,10 +706,10 @@ async def test_patch_project_rejects_bad_budget_action(client):
         },
     )
     resp = await client.patch(
-        "/v1/projects/invalid-update", json={"budget_action": "explode"}
+        "/v1/projects/invalid-update", json={"budget_action": budget_action}
     )
     assert resp.status_code == 400
-    assert resp.json()["detail"] == "Invalid budget_action 'explode'"
+    assert resp.json()["detail"] == f"Invalid budget_action '{budget_action}'"
     detail = await client.get("/v1/projects/invalid-update")
     assert detail.json()["budget_action"] == "warn"
 

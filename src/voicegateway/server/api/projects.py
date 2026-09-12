@@ -72,6 +72,16 @@ async def create_project(
     body: dict[str, Any],
     gateway: Gateway = Depends(get_gateway),
 ) -> dict:
+    """Create a managed project from the request body through the gateway.
+
+    Args:
+        body: Project fields. budget_action accepts warn, throttle, or block;
+            omission defaults to warn and invalid values produce HTTP 400.
+        gateway: Gateway providing project storage and configuration refresh.
+
+    Returns:
+        The project ID, its database source, and a creation confirmation.
+    """
     if gateway.storage is None:
         raise HTTPException(400, "Storage not enabled")
     pid = body.get("project_id", "")
@@ -101,6 +111,17 @@ async def update_project(
     body: dict[str, Any],
     gateway: Gateway = Depends(get_gateway),
 ) -> dict:
+    """Update stored project fields and refresh the gateway configuration.
+
+    Args:
+        project_id: ID of the existing managed project.
+        body: Changed fields. An omitted budget_action retains its stored value;
+            provided values must be warn, throttle, or block, else HTTP 400.
+        gateway: Gateway providing project storage and configuration refresh.
+
+    Returns:
+        The project ID and an update confirmation.
+    """
     if gateway.storage is None:
         raise HTTPException(400, "Storage not enabled")
     managed = await gateway.storage.get_managed_project(project_id)

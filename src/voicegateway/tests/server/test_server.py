@@ -691,6 +691,7 @@ async def test_create_project_rejects_bad_budget_action(client, budget_action):
 
 
 async def test_create_project_conflict(client):
+    """Use the ASGI client to reject creation of an already configured project."""
     resp = await client.post(
         "/v1/projects",
         json={
@@ -702,6 +703,7 @@ async def test_create_project_conflict(client):
 
 
 async def test_patch_project(client):
+    """Use the ASGI client to persist a supported project-name update."""
     await client.post(
         "/v1/projects",
         json={
@@ -742,6 +744,7 @@ async def test_patch_project_rejects_bad_budget_action(client, budget_action):
 
 
 async def test_delete_project_yaml_forbidden(client):
+    """Use the ASGI client to reject deletion of a YAML-managed project."""
     resp = await client.delete("/v1/projects/test-project?confirm=true")
     assert resp.status_code == 403
 

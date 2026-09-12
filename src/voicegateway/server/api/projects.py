@@ -17,6 +17,7 @@ _VALID_BUDGET_ACTIONS = {"warn", "throttle", "block"}
 
 
 def _validate_budget_action(value: object) -> str:
+    """Return a supported string action or raise HTTP 400 for the supplied value."""
     if not isinstance(value, str) or value not in _VALID_BUDGET_ACTIONS:
         raise HTTPException(400, f"Invalid budget_action '{value}'")
     return value

@@ -644,6 +644,15 @@ async def test_delete_model_confirm(client):
 
 @pytest.mark.parametrize("budget_action", ["warn", "block", "throttle"])
 async def test_create_project(client, budget_action):
+    """Persist each valid budget action using the async HTTP client fixture.
+
+    Args:
+        client: Isolated ASGI client with project storage fixtures.
+        budget_action: Parameterized action value sent in the JSON request.
+
+    Returns:
+        None; assertions verify the response and persisted state.
+    """
     resp = await client.post(
         "/v1/projects",
         json={
@@ -660,6 +669,15 @@ async def test_create_project(client, budget_action):
 
 @pytest.mark.parametrize("budget_action", ["explode", 123])
 async def test_create_project_rejects_bad_budget_action(client, budget_action):
+    """Reject each unsupported action through the async HTTP client fixture.
+
+    Args:
+        client: Isolated ASGI client with project storage fixtures.
+        budget_action: Parameterized action value sent in the JSON request.
+
+    Returns:
+        None; assertions verify the response and persisted state.
+    """
     resp = await client.post(
         "/v1/projects",
         json={
@@ -698,6 +716,15 @@ async def test_patch_project(client):
 
 @pytest.mark.parametrize("budget_action", ["explode", 123])
 async def test_patch_project_rejects_bad_budget_action(client, budget_action):
+    """Use the client to reject each invalid action without changing stored state.
+
+    Args:
+        client: Isolated ASGI client with project storage fixtures.
+        budget_action: Parameterized action value sent in the JSON request.
+
+    Returns:
+        None; assertions verify the response and persisted state.
+    """
     await client.post(
         "/v1/projects",
         json={
